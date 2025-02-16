@@ -1,1 +1,42 @@
+name: Run Python Tests
 
+o: 
+p push:
+    branches:
+- main
+  pull_request:
+    branches:
+      - main
+
+feps:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'
+
+      - name: Set up virtual environment
+        run: |
+         python -m venv venv
+         source venv/bin/activate
+         python -m pip install --upgrade pip
+         if [ -f requirements.txt ]; then pip -install --upgrade -r requirements.txt; fi
+
+      - name: Run tests and save results
+        run: |
+         mkdir -p logs
+         source venv/bin/activate
+         pytest --maxfail=5 --disable-warnings --tb-short --json-report --json-report-file=logs/test_results.json
+         cat logs/test_results.json
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: logs/test_results.json
