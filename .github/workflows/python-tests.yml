@@ -1,14 +1,14 @@
 name: Run Python Tests
 
-o: 
-p push:
+on:
+  push:
     branches:
-- main
+      - main
   pull_request:
     branches:
       - main
 
-feps:
+jobs:
   test:
     runs-on: ubuntu-latest
 
@@ -25,15 +25,15 @@ feps:
         run: |
          python -m venv venv
          source venv/bin/activate
-         python -m pip install --upgrade pip
-         if [ -f requirements.txt ]; then pip -install --upgrade -r requirements.txt; fi
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install --upgrade -r requirements.txt; fi
 
       - name: Run tests and save results
         run: |
-         mkdir -p logs
-         source venv/bin/activate
-         pytest --maxfail=5 --disable-warnings --tb-short --json-report --json-report-file=logs/test_results.json
-         cat logs/test_results.json
+          mkdir -p logs
+          source venv/bin/activate
+          pytest --maxfail=5 --disable-warnings --tb=short --json-report --json-report-file=logs/test_results.json
+          cat logs/test_results.json
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
